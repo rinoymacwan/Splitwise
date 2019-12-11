@@ -197,6 +197,7 @@ namespace Splitwise.Web
 
                 if (env.IsDevelopment())
                 {
+
                     spa.UseAngularCliServer(npmScript: "start");
                 }
             });
