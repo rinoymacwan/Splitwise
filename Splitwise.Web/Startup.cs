@@ -28,6 +28,7 @@ using System;
 using System.Text;
 using AutoMapper;
 using Splitwise.DomainModel.ApplicationClasses;
+using Splitwise.Repository.DataRepository;
 
 namespace Splitwise.Web
 {
@@ -87,7 +88,9 @@ namespace Splitwise.Web
             services.AddCors();
 
             services.AddScoped<IJwtFactory, JwtFactory>();
-            
+
+            services.AddScoped<IDataRepository, DataRepository>();
+
             var jwtAppSettingOptions = Configuration.GetSection(nameof(JwtIssuerOptions));
 
             // Configure JwtIssuerOptions

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Splitwise.DomainModel.ApplicationClasses;
 using Splitwise.DomainModel.Models;
 using Splitwise.Models;
+using Splitwise.Repository.DataRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +15,13 @@ namespace Splitwise.Repository.GroupMemberMappingsRepository
     {
         private SplitwiseContext context;
         private readonly IMapper _mapper;
+        private readonly IDataRepository dataRepository;
 
-
-        public GroupMemberMappingsRepository(SplitwiseContext context, IMapper mapper)
+        public GroupMemberMappingsRepository(SplitwiseContext context, IMapper mapper, IDataRepository _dataRepository)
         {
             this.context = context;
             _mapper = mapper;
+            dataRepository = _dataRepository;
         }
         public bool GroupMemberMappingExists(int id)
         {
@@ -28,22 +30,22 @@ namespace Splitwise.Repository.GroupMemberMappingsRepository
 
         public async Task CreateGroupMemberMapping(GroupMemberMappings GroupMemberMapping)
         {
-            context.GroupMemberMappings.Add(GroupMemberMapping);
+            dataRepository.Add(GroupMemberMapping);
             await Save();
         }
 
         public async Task DeleteGroupMemberMapping(GroupMemberMappingsAC GroupMemberMapping)
         {
-            var x = await context.GroupMemberMappings.FindAsync(GroupMemberMapping.Id);
-            context.GroupMemberMappings.Remove(x);
+            var x = await dataRepository.FindAsync<GroupMemberMappings>(GroupMemberMapping.Id);
+            dataRepository.Remove(x);
         }
 
         public async Task DeleteGroupMemberMappingByGroupId(int id)
         {
-            var x = context.GroupMemberMappings.Where(k => k.GroupId == id);
+            var x = dataRepository.Where<GroupMemberMappings>(k => k.GroupId == id);
             foreach( var y in x)
             {
-                context.GroupMemberMappings.Remove(y);
+                dataRepository.Remove(y);
             }
             
         }
@@ -55,22 +57,22 @@ namespace Splitwise.Repository.GroupMemberMappingsRepository
 
         public IEnumerable<GroupMemberMappingsAC> GetGroupMemberMappings()
         {
-            return _mapper.Map<IEnumerable<GroupMemberMappingsAC>>(context.GroupMemberMappings.Include(k => k.User).Include(l => l.Group));
+            return _mapper.Map<IEnumerable<GroupMemberMappingsAC>>(dataRepository.GetAll<GroupMemberMappings>().Include(k => k.User).Include(l => l.Group));
         }
 
         public async Task<GroupMemberMappingsAC> GetGroupMemberMapping(int id)
         {
-            return _mapper.Map<GroupMemberMappingsAC>(await context.GroupMemberMappings.FindAsync(id));
+            return _mapper.Map<GroupMemberMappingsAC>(await dataRepository.FindAsync<GroupMemberMappings>(id));
         }
 
         public async Task Save()
         {
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
 
         public void UpdateGroupMemberMapping(GroupMemberMappings GroupMemberMapping)
         {
-            context.Entry(GroupMemberMapping).State = EntityState.Modified;
+            dataRepository.Entry(GroupMemberMapping);
         }
     }
 }

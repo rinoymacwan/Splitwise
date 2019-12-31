@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Splitwise.DomainModel.ApplicationClasses;
 using Splitwise.DomainModel.Models;
 using Splitwise.Models;
+using Splitwise.Repository.DataRepository;
 
 namespace Splitwise.Repository.CategoriesRepository
 {
@@ -14,11 +15,14 @@ namespace Splitwise.Repository.CategoriesRepository
     {
         private SplitwiseContext context;
         private readonly IMapper _mapper;
+        private readonly IDataRepository dataRepository;
 
-        public CategoriesRepository(SplitwiseContext context, IMapper mapper)
+        public CategoriesRepository(SplitwiseContext context, IMapper mapper, IDataRepository _dataRepository)
         {
             this.context = context;
             _mapper = mapper;
+            dataRepository = _dataRepository;
+
         }
         public bool CategoryExists(int id)
         {
@@ -27,13 +31,13 @@ namespace Splitwise.Repository.CategoriesRepository
 
         public void CreateCategory(Categories Category)
         {
-            context.Categories.Add(Category);
+            dataRepository.Add(Category);
         }
 
         public async Task DeleteCategory(CategoriesAC Category)
         {
-            var x = await context.Categories.FindAsync(Category.Id);
-            context.Categories.Remove(x);
+            var x = await dataRepository.FindAsync<Categories>(Category.Id);
+            dataRepository.Remove(x);
         }
 
         public void Dispose()
@@ -43,22 +47,22 @@ namespace Splitwise.Repository.CategoriesRepository
 
         public IEnumerable<CategoriesAC> GetCategories()
         {
-            return _mapper.Map<IEnumerable<CategoriesAC>>(context.Categories);
+            return _mapper.Map<IEnumerable<CategoriesAC>>(dataRepository.GetAll<Categories>());
         }
 
         public async Task<CategoriesAC> GetCategory(int id)
         {
-            return _mapper.Map<CategoriesAC>(await context.Categories.FindAsync(id));
+            return _mapper.Map<CategoriesAC>(await dataRepository.FindAsync<Categories>(id));
         }
 
         public async Task Save()
         {
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
 
         public void UpdateCategory(Categories Category)
         {
-            context.Entry(Category).State = EntityState.Modified;
+            dataRepository.Entry(Category);
         }
     }
 }

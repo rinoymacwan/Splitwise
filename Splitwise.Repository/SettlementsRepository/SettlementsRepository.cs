@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Splitwise.DomainModel.ApplicationClasses;
 using Splitwise.DomainModel.Models;
 using Splitwise.Models;
+using Splitwise.Repository.DataRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,12 @@ namespace Splitwise.Repository.SettlementsRepository
     {
         private SplitwiseContext context;
         IMapper _mapper;
-        public SettlementsRepository(SplitwiseContext context, IMapper mapper)
+        private readonly IDataRepository dataRepository;
+        public SettlementsRepository(SplitwiseContext context, IMapper mapper, IDataRepository _dataRepository)
         {
             this.context = context;
             _mapper = mapper;
+            dataRepository = _dataRepository;
         }
         public bool SettlementExists(int id)
         {
@@ -26,12 +29,12 @@ namespace Splitwise.Repository.SettlementsRepository
 
         public void CreateSettlement(Settlements Settlement)
         {
-            context.Settlements.Add(Settlement);
+            dataRepository.Add(Settlement);
         }
 
         public async Task DeleteSettlement(SettlementsAC Settlement)
         {
-            var x = await context.Settlements.FindAsync(Settlement.Id);
+            var x = await dataRepository.FindAsync<Settlements>(Settlement.Id);
             context.Settlements.Remove(x);
         }
 
@@ -42,32 +45,32 @@ namespace Splitwise.Repository.SettlementsRepository
 
         public IEnumerable<SettlementsAC> GetSettlements()
         {
-            return _mapper.Map<IEnumerable<SettlementsAC>>(context.Settlements.Include(p => p.Payee).Include(l => l.Payer));
+            return _mapper.Map<IEnumerable<SettlementsAC>>(dataRepository.GetAll<Settlements>().Include(p => p.Payee).Include(l => l.Payer));
         }
 
         public IEnumerable<SettlementsAC> GetSettlementsByUserId(string id)
         {
-            return _mapper.Map<IEnumerable<SettlementsAC>>(context.Settlements.Include(p => p.Payee).Include(l => l.Payer).Where(s => s.PayeeId == id || s.PayerId == id).ToList());
+            return _mapper.Map<IEnumerable<SettlementsAC>>(dataRepository.GetAll<Settlements>().Include(p => p.Payee).Include(l => l.Payer).Where(s => s.PayeeId == id || s.PayerId == id).ToList());
         }
 
         public IEnumerable<SettlementsAC> GetSettlementsByGroupId(int id)
         {
-            return _mapper.Map<IEnumerable<SettlementsAC>>(context.Settlements.Include(p => p.Payee).Include(l => l.Payer).Where(s => s.GroupId == id).ToList());
+            return _mapper.Map<IEnumerable<SettlementsAC>>(dataRepository.GetAll<Settlements>().Include(p => p.Payee).Include(l => l.Payer).Where(s => s.GroupId == id).ToList());
         }
 
         public async Task<SettlementsAC> GetSettlement(int id)
         {
-            return _mapper.Map<SettlementsAC>(await context.Settlements.FindAsync(id));
+            return _mapper.Map<SettlementsAC>(await dataRepository.FindAsync<Settlements>(id));
         }
 
         public async Task Save()
         {
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
 
         public void UpdateSettlement(Settlements Settlement)
         {
-            context.Entry(Settlement).State = EntityState.Modified;
+            context.Entry(Settlement);
         }
     }
 }

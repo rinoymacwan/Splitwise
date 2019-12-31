@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Splitwise.DomainModel.ApplicationClasses;
 using Splitwise.DomainModel.Models;
 using Splitwise.Models;
+using Splitwise.Repository.DataRepository;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,10 +15,12 @@ namespace Splitwise.Repository.PayeesRepository
     {
         private SplitwiseContext context;
         private readonly IMapper _mapper;
-        public PayeesRepository(SplitwiseContext context, IMapper mapper)
+        private readonly IDataRepository dataRepository;
+        public PayeesRepository(SplitwiseContext context, IMapper mapper, IDataRepository _dataRepository)
         {
             this.context = context;
             _mapper = mapper;
+            dataRepository = _dataRepository;
         }
         public bool PayeeExists(int id)
         {
@@ -26,13 +29,13 @@ namespace Splitwise.Repository.PayeesRepository
 
         public void CreatePayee(Payees Payee)
         {
-            context.Payees.Add(Payee);
+            dataRepository.Add(Payee);
         }
 
         public async Task DeletePayee(PayeesAC Payee)
         {
-            var x = await context.Payees.FindAsync(Payee.Id);
-            context.Payees.Remove(x);
+            var x = await dataRepository.FindAsync<Payees>(Payee.Id);
+            dataRepository.Remove(x);
         }
 
         public void Dispose()
@@ -42,11 +45,11 @@ namespace Splitwise.Repository.PayeesRepository
 
         public IEnumerable<PayeesAC> GetPayees()
         {
-            return _mapper.Map<IEnumerable<PayeesAC>>(context.Payees.Include(t => t.User));
+            return _mapper.Map<IEnumerable<PayeesAC>>(dataRepository.GetAll<Payees>().Include(t => t.User));
         }
         public IEnumerable<PayeesAC> GetPayeesByExpenseId(int id)
         {
-            return _mapper.Map<IEnumerable<PayeesAC>>(context.Payees.Include(t => t.User).Where(e => e.ExpenseId == id).ToList());
+            return _mapper.Map<IEnumerable<PayeesAC>>(dataRepository.GetAll<Payees>().Include(t => t.User).Where(e => e.ExpenseId == id).ToList());
         }
 
         public IEnumerable<PayeesAC> GetPayeesByPayeeId(string id)
@@ -56,17 +59,17 @@ namespace Splitwise.Repository.PayeesRepository
 
         public async Task<PayeesAC> GetPayee(int id)
         {
-            return _mapper.Map<PayeesAC>(await context.Payees.FindAsync(id));
+            return _mapper.Map<PayeesAC>(await dataRepository.FindAsync<Payees>(id));
         }
 
         public async Task Save()
         {
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
 
         public void UpdatePayee(Payees Payee)
         {
-            context.Entry(Payee).State = EntityState.Modified;
+            dataRepository.Entry(Payee);
         }
     }
 }

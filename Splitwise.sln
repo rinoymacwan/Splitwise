@@ -13,9 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splitwise.Util", "Splitwise
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splitwise.DomainModel", "Splitwise.DomainModel\Splitwise.DomainModel.csproj", "{9F33EB09-A65C-49EB-8CFC-1D152991FFA4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splitwise.Core.Test", "Splitwise.Core.Test\Splitwise.Core.Test.csproj", "{25882E6B-C77A-47C9-AE73-FBFE22DEFB59}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Splitwise.Repository.Test", "Splitwise.Repository.Test\Splitwise.Repository.Test.csproj", "{D5395FA9-1CF2-4D33-B851-6BA36405B9E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Splitwise.Repository.Test", "Splitwise.Repository.Test\Splitwise.Repository.Test.csproj", "{D5395FA9-1CF2-4D33-B851-6BA36405B9E5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -43,10 +41,6 @@ Global
 		{9F33EB09-A65C-49EB-8CFC-1D152991FFA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9F33EB09-A65C-49EB-8CFC-1D152991FFA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9F33EB09-A65C-49EB-8CFC-1D152991FFA4}.Release|Any CPU.Build.0 = Release|Any CPU
-		{25882E6B-C77A-47C9-AE73-FBFE22DEFB59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{25882E6B-C77A-47C9-AE73-FBFE22DEFB59}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{25882E6B-C77A-47C9-AE73-FBFE22DEFB59}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{25882E6B-C77A-47C9-AE73-FBFE22DEFB59}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D5395FA9-1CF2-4D33-B851-6BA36405B9E5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D5395FA9-1CF2-4D33-B851-6BA36405B9E5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5395FA9-1CF2-4D33-B851-6BA36405B9E5}.Release|Any CPU.ActiveCfg = Release|Any CPU

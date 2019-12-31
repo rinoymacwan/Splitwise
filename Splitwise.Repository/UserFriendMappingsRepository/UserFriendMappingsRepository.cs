@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Splitwise.DomainModel.ApplicationClasses;
 using Splitwise.DomainModel.Models;
 using Splitwise.Models;
+using Splitwise.Repository.DataRepository;
 using Splitwise.Repository.UsersRepository;
 
 namespace Splitwise.Repository.UserFriendMappingsRepository
@@ -16,17 +17,20 @@ namespace Splitwise.Repository.UserFriendMappingsRepository
         private SplitwiseContext context;
         private readonly IUsersRepository _usersRepository;
         private readonly IMapper _mapper;
-        public UserFriendMappingsRepository(SplitwiseContext context, IUsersRepository usersRepository, IMapper mapper)
+        private readonly IDataRepository dataRepository;
+
+        public UserFriendMappingsRepository(SplitwiseContext context, IUsersRepository usersRepository, IMapper mapper, IDataRepository _dataRepository)
         {
             this.context = context;
             this._usersRepository = usersRepository;
             _mapper = mapper;
+            dataRepository = _dataRepository;
         }
         public void CreateUserFriendMapping(UserFriendMappings userFriendMapping)
         {
             UserFriendMappings otherEntry = new UserFriendMappings() { UserId = userFriendMapping.FriendId, FriendId = userFriendMapping.UserId };
-            context.UserFriendMappings.Add(userFriendMapping);
-            context.UserFriendMappings.Add(otherEntry);
+            dataRepository.Add(userFriendMapping);
+            dataRepository.Add(otherEntry);
         }
         public async Task<UsersAC> CreateUserFriendMappingByEmail(string id, Users user)
         {
@@ -48,20 +52,20 @@ namespace Splitwise.Repository.UserFriendMappingsRepository
         }
         public async Task DeleteUserFriendMapping(UserFriendMappingsAC UserFriendMapping)
         {
-            var x = await context.UserFriendMappings.Where(k => k.UserId == UserFriendMapping.FriendId && k.FriendId == UserFriendMapping.UserId).FirstOrDefaultAsync();
-            var y = await context.UserFriendMappings.FindAsync(UserFriendMapping.Id);
-            context.UserFriendMappings.Remove(y);
-            context.UserFriendMappings.Remove(x);
+            var x = await dataRepository.GetAll<UserFriendMappings>().Where(k => k.UserId == UserFriendMapping.FriendId && k.FriendId == UserFriendMapping.UserId).FirstOrDefaultAsync();
+            var y = await dataRepository.FindAsync<UserFriendMappings>(UserFriendMapping.Id);
+            dataRepository.Remove(y);
+            dataRepository.Remove(x);
         }
 
         public async Task DeleteUserFriendMappingByIds(string id1, string id2)
         {
-            var x = await context.UserFriendMappings.Where(k => k.UserId == id1 && k.FriendId == id2).FirstOrDefaultAsync();
-            var y = await context.UserFriendMappings.Where(k => k.UserId == id2 && k.FriendId == id1).FirstOrDefaultAsync();
-            var z = await context.UserFriendMappings.ToListAsync();
+            var x = await dataRepository.GetAll<UserFriendMappings>().Where(k => k.UserId == id1 && k.FriendId == id2).FirstOrDefaultAsync();
+            var y = await dataRepository.GetAll<UserFriendMappings>().Where(k => k.UserId == id2 && k.FriendId == id1).FirstOrDefaultAsync();
+            // var z = await context.UserFriendMappings.ToListAsync();
 
-            context.UserFriendMappings.Remove(x);
-            context.UserFriendMappings.Remove(y);
+            dataRepository.Remove(x);
+            dataRepository.Remove(y);
         }
 
         public void Dispose()
@@ -71,23 +75,23 @@ namespace Splitwise.Repository.UserFriendMappingsRepository
 
         public async Task<UserFriendMappingsAC> GetUserFriendMapping(int id)
         {
-            return _mapper.Map<UserFriendMappingsAC>(await context.UserFriendMappings.FindAsync(id));
+            return _mapper.Map<UserFriendMappingsAC>(await dataRepository.FindAsync<UserFriendMappings>(id));
         }
 
         public IEnumerable<UserFriendMappingsAC> GetUserFriendMappings()
         {
             //System.Diagnostics.Debug.WriteLine("ASJKHDSJKHSDK");
-            return _mapper.Map<IEnumerable<UserFriendMappingsAC>>(context.UserFriendMappings);
+            return _mapper.Map<IEnumerable<UserFriendMappingsAC>>(dataRepository.GetAll<UserFriendMappings>());
         }
 
         public async Task SaveAsync()
         {
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
 
         public void UpdateUserFriendMapping(UserFriendMappings UserFriendMapping)
         {
-            context.Entry(UserFriendMapping).State = EntityState.Modified;
+            dataRepository.Entry(UserFriendMapping);
         }
 
         public bool UserFriendMappingExists(string id)

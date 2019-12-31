@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Splitwise.DomainModel.ApplicationClasses;
 using Splitwise.DomainModel.Models;
 using Splitwise.Models;
+using Splitwise.Repository.DataRepository;
 using Splitwise.Utility;
 using Splitwise.Utility.Helpers;
 using System;
@@ -23,13 +24,16 @@ namespace Splitwise.Repository.UsersRepository
         private readonly IJwtFactory _jwtFactory;
         private readonly JwtIssuerOptions _jwtOptions;
         private readonly IMapper _mapper;
-        public UsersRepository(SplitwiseContext context, UserManager<Users> _userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, IMapper mapper)
+        private readonly IDataRepository dataRepository;
+
+        public UsersRepository(SplitwiseContext context, UserManager<Users> _userManager, IJwtFactory jwtFactory, IOptions<JwtIssuerOptions> jwtOptions, IMapper mapper, IDataRepository _dataRepository)
         {
             this.context = context;
             this._userManager = _userManager;
             _jwtFactory = jwtFactory;
             _jwtOptions = jwtOptions.Value;
             _mapper = mapper;
+            dataRepository = _dataRepository;
         }
         public IEnumerable<UsersAC> GetUsers()
         {
@@ -48,7 +52,7 @@ namespace Splitwise.Repository.UsersRepository
 
         public IEnumerable<UsersAC> GetAllFriends(string id)
         {
-            return _mapper.Map<IEnumerable<UsersAC>>(context.UserFriendMappings.Where(u => u.UserId == id).Select(x => x.Friend));
+            return _mapper.Map<IEnumerable<UsersAC>>(dataRepository.GetAll<UserFriendMappings>().Where(u => u.UserId == id).Select(x => x.Friend));
         }
 
         public async Task CreateUser(Users user)
@@ -64,7 +68,7 @@ namespace Splitwise.Repository.UsersRepository
 
         public async Task Save()
         {
-            await context.SaveChangesAsync();
+            await dataRepository.SaveChangesAsync();
         }
         
 
