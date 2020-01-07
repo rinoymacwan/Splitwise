@@ -27,9 +27,10 @@ namespace Splitwise.Repository.DataRepository
             return await CreateDbSet<T>().AddAsync(entity);
         }
 
-        public EntityEntry<T> Add<T>(T entity) where T : class
+        public T Add<T>(T entity) where T : class
         {
-            return CreateDbSet<T>().Add(entity);
+            var x = CreateDbSet<T>().Add(entity);
+            return x.Entity;
         }
 
         public async Task AddRangeAsync<T>(IEnumerable<T> entities) where T : class

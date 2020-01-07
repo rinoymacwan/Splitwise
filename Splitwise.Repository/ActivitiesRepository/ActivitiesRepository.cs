@@ -22,14 +22,19 @@ namespace Splitwise.Repository.ActivitiesRepository
             _mapper = mapper;
             dataRepository = _dataRepository; 
         }
+        /*
+
+         * */
         public bool ActivityExists(int id)
         {
             return context.Activities.Any(e => e.Id == id);
         }
 
-        public void CreateActivity(Activities Activity)
+        public Activities CreateActivity(Activities Activity)
         {
-            dataRepository.Add(Activity);
+            var x = dataRepository.Add(Activity);
+            return x;
+
         }
 
         public async Task DeleteActivity(ActivitiesAC Activity)
@@ -59,7 +64,9 @@ namespace Splitwise.Repository.ActivitiesRepository
 
         public async Task<ActivitiesAC> GetActivity(int id)
         {
-            return _mapper.Map<ActivitiesAC>(await dataRepository.FindAsync<Activities>(id));
+            var data =  await dataRepository.FirstAsync<Activities>(k => k.Id == id);
+            var data2 = _mapper.Map<ActivitiesAC>(data);
+            return data2;
         }
 
         public async Task Save()

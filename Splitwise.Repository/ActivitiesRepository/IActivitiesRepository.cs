@@ -12,7 +12,7 @@ namespace Splitwise.Repository.ActivitiesRepository
         IEnumerable<ActivitiesAC> GetActivities();
         IEnumerable<ActivitiesAC> GetActivitiesByUserId(string id);
         Task<ActivitiesAC> GetActivity(int id);
-        void CreateActivity(Activities Activity);
+        Activities CreateActivity(Activities Activity);
         void UpdateActivity(Activities Activity);
         Task DeleteActivity(ActivitiesAC Activity);
         Task DeleteAllActivities(string id);
